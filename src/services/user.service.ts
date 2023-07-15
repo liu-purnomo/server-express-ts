@@ -1,10 +1,11 @@
+import { excludeList } from "../constants/excludeList";
 import {
   comparePassword,
   tokenGenerator,
   uuidStringGenerator,
 } from "../helpers";
 
-const { User } = require("../models");
+const { User, Op } = require("../models");
 
 type User = typeof User;
 
@@ -14,7 +15,7 @@ class UserService {
     email: string,
     password: string
   ): Promise<typeof User | null> {
-    const user = User.create({
+    const user = await User.create({
       username,
       email,
       password,
@@ -23,7 +24,7 @@ class UserService {
   }
 
   static async findByEmail(email: string): Promise<typeof User | null> {
-    const user = User.findOne({
+    const user = await User.findOne({
       where: {
         email,
       },
@@ -33,7 +34,7 @@ class UserService {
 
   //delete token when expired
   static async deleteToken(email: string): Promise<typeof User | null> {
-    const user = User.update(
+    const user = await User.update(
       {
         token: null,
         token_expires_at: null,
@@ -52,7 +53,7 @@ class UserService {
     const newNrrp = currentNrrp ? Number(currentNrrp) + 1 : 1;
     const nrrp = newNrrp.toString().padStart(8, "0");
 
-    const user = User.update(
+    const user = await User.update(
       {
         status: "ACTIVE",
         token: null,
@@ -91,7 +92,7 @@ class UserService {
   }
 
   static async findById(id: string): Promise<typeof User | null> {
-    const user = User.findByPk(id);
+    const user = await User.findByPk(id);
     return user;
   }
 
@@ -99,7 +100,7 @@ class UserService {
     id: string,
     password: string
   ): Promise<typeof User | null> {
-    const user = User.update(
+    const user = await User.update(
       {
         password,
       },
@@ -117,7 +118,7 @@ class UserService {
     password_history: string[],
     password: string
   ): Promise<{ updatedRows: number }> {
-    const updatedRows = User.update(
+    const updatedRows = await User.update(
       {
         password_history: [...password_history, password],
       },
@@ -135,7 +136,7 @@ class UserService {
   ): Promise<{ updatedRows: number; token: string | null }> {
     //membuat token dengan uuid
     const token = uuidStringGenerator();
-    const updatedRows = User.update(
+    const updatedRows = await User.update(
       {
         token,
       },
@@ -154,7 +155,7 @@ class UserService {
     email: string,
     password: string
   ): Promise<{ updatedRows: number }> {
-    const updatedRows = User.update(
+    const updatedRows = await User.update(
       {
         password,
         token: null,
@@ -184,6 +185,208 @@ class UserService {
     });
 
     return status;
+  }
+
+  static async profile(id: string): Promise<typeof User | null> {
+    const user = User.findByPk(id, {
+      attributes: {
+        exclude: [
+          "password",
+          "password_history",
+          "token",
+          "token_expires_at",
+          "created_at",
+          "updated_at",
+          "deleted_at",
+          "ip_address",
+          "is_admin",
+          "is_confirmed",
+          "status",
+        ],
+      },
+    });
+    return user;
+  }
+
+  static async detail(id: string): Promise<typeof User | null> {
+    const user = await User.findByPk(id);
+
+    if (!user) return null;
+
+    const exclude = [...user.profile_privacy, ...excludeList.userProfile];
+
+    const profile = await User.findByPk(id, {
+      attributes: {
+        exclude: exclude,
+      },
+    });
+
+    return profile;
+  }
+
+  static async update(
+    id: string,
+    username: string,
+    first_name: string,
+    last_name: string,
+    phone: string,
+    gender: string,
+    avatar: string,
+    cover: string,
+    pasfoto: string,
+    address: string,
+    country: string,
+    province: string,
+    regency: string,
+    district: string,
+    village: string,
+    postal_code: string,
+    latitude: string,
+    longitude: string,
+    profile_privacy: string[],
+    contact_privacy: string,
+    date_of_birth: Date,
+    place_of_birth: string,
+    about: string,
+    website: string,
+    facebook: string,
+    twitter: string,
+    instagram: string,
+    linkedin: string,
+    youtube: string,
+    whatsapp: string,
+    tiktok: string,
+    threads: string,
+    curriculum_vitae: string,
+    open_to_work: boolean,
+    identity_number: string,
+    identity_card: string
+  ): Promise<number> {
+    const user = await User.update(
+      {
+        username,
+        first_name,
+        last_name,
+        phone,
+        gender,
+        avatar,
+        cover,
+        pasfoto,
+        address,
+        country,
+        province,
+        regency,
+        district,
+        village,
+        postal_code,
+        latitude,
+        longitude,
+        profile_privacy,
+        contact_privacy,
+        date_of_birth,
+        place_of_birth,
+        about,
+        website,
+        facebook,
+        twitter,
+        instagram,
+        linkedin,
+        youtube,
+        whatsapp,
+        tiktok,
+        threads,
+        curriculum_vitae,
+        open_to_work,
+        identity_number,
+        identity_card,
+      },
+      {
+        where: {
+          id,
+        },
+      }
+    );
+
+    return user;
+  }
+
+  static async index(
+    limit: number,
+    offset: number,
+    search: string,
+    sort: string,
+    order: string,
+    province: string,
+    regency: string
+  ): Promise<{ count: number; rows: User[] }> {
+    const whereCondition: any = {};
+
+    // Menggunakan Op.or untuk mencari data yang mengandung kata yang dicari
+    if (search) {
+      whereCondition[Op.or] = [
+        { username: { [Op.iLike]: `%${search}%` } },
+        { email: { [Op.iLike]: `%${search}%` } },
+        { first_name: { [Op.iLike]: `%${search}%` } },
+        { last_name: { [Op.iLike]: `%${search}%` } },
+      ];
+    }
+
+    if (province) {
+      if (whereCondition[Op.and]) {
+        whereCondition[Op.and].push({
+          province: { [Op.like]: `%${province}%` },
+        });
+      } else {
+        whereCondition[Op.and] = [{ province: province }];
+      }
+    }
+
+    if (regency) {
+      if (whereCondition[Op.and]) {
+        whereCondition[Op.and].push({ regency: { [Op.like]: `%${regency}%` } });
+      } else {
+        whereCondition[Op.and] = [{ regency: regency }];
+      }
+    }
+
+    let orderCondition: any = [["created_at", "DESC"]];
+
+    if (sort) {
+      orderCondition = [[sort, order]];
+    }
+
+    console.log(whereCondition, orderCondition);
+
+    const users = await User.findAndCountAll({
+      where: whereCondition,
+      limit,
+      offset,
+      // order: orderCondition,
+      attributes: [
+        "username",
+        "email",
+        "first_name",
+        "last_name",
+        "avatar",
+        "province",
+        "regency",
+        "district",
+        "about",
+        "website",
+        "facebook",
+        "twitter",
+        "instagram",
+        "linkedin",
+        "youtube",
+        "whatsapp",
+        "tiktok",
+        "threads",
+        "open_to_work",
+        "created_at",
+      ],
+    });
+
+    return users;
   }
 }
 

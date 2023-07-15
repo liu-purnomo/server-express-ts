@@ -7,6 +7,7 @@ export const errorHandler = async (
   res: Response,
   next: NextFunction
 ) => {
+  console.error(err);
   let code = 500;
   let message = "Internal Server Error";
 

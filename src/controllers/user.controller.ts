@@ -25,7 +25,7 @@ class UserController {
 
       if (!sendEmail) throw customError(errorList.sendEmailFailed);
 
-      res.status(201).json({ message: "Register success" });
+      res.status(201).json({ status: "success", message: "Register success" });
     } catch (error) {
       next(error);
     }
@@ -56,7 +56,9 @@ class UserController {
 
       await UserService.verify(email as string);
 
-      res.status(200).json({ message: "Verify success, please login" });
+      res
+        .status(200)
+        .json({ status: "success", message: "Verify success, please login" });
     } catch (error) {
       next(error);
     }
@@ -94,7 +96,7 @@ class UserController {
 
       if (!sendEmail) throw customError(errorList.sendEmailFailed);
 
-      res.status(200).json({ message: "New email sent" });
+      res.status(200).json({ status: "success", message: "New email sent" });
     } catch (error) {
       next(error);
     }
@@ -166,7 +168,9 @@ class UserController {
         user.password
       );
 
-      res.status(200).json({ message: "Change password success" });
+      res
+        .status(200)
+        .json({ status: "success", message: "Change password success" });
     } catch (error) {
       console.log(error);
       next(error);
@@ -197,7 +201,9 @@ class UserController {
 
       if (!sendEmail) throw customError(errorList.sendEmailFailed);
 
-      res.status(200).json({ message: "Link for reset pasword sent" });
+      res
+        .status(200)
+        .json({ status: "success", message: "Link for reset pasword sent" });
     } catch (error) {
       console.error(error);
       next(error);
@@ -238,7 +244,163 @@ class UserController {
         user.password
       );
 
-      res.status(200).json({ message: "Reset password success" });
+      res
+        .status(200)
+        .json({ status: "success", message: "Reset password success" });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  //membuat static untuk get profile detail berdasarkan user id dari req user
+  static async profile(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = (req as any).user;
+      const user = await UserService.profile(id as string);
+      if (!user) throw customError(errorList.userNotFound);
+      res.status(200).json({
+        status: "success",
+        message: "Get profile success",
+        data: user,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  //membuat static untuk get detail user berdasarkan id dari req params
+  static async detail(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+      const user = await UserService.detail(id as string);
+      if (!user) throw customError(errorList.userNotFound);
+      res.status(200).json({
+        status: "success",
+        message: "Get detail user success",
+        data: user,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  //membuat static untuk update user berdasarkan id dari req user
+  static async update(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = (req as any).user;
+      const {
+        username,
+        first_name,
+        last_name,
+        phone,
+        gender,
+        avatar,
+        cover,
+        pasfoto,
+        address,
+        country,
+        province,
+        regency,
+        district,
+        village,
+        postal_code,
+        latitude,
+        longitude,
+        profile_privacy,
+        contact_privacy,
+        date_of_birth,
+        place_of_birth,
+        about,
+        website,
+        facebook,
+        twitter,
+        instagram,
+        linkedin,
+        youtube,
+        whatsapp,
+        tiktok,
+        threads,
+        curriculum_vitae,
+        open_to_work,
+        identity_number,
+        identity_card,
+      } = req.body;
+      const user = await UserService.update(
+        id as string,
+        username,
+        first_name,
+        last_name,
+        phone,
+        gender,
+        avatar,
+        cover,
+        pasfoto,
+        address,
+        country,
+        province,
+        regency,
+        district,
+        village,
+        postal_code,
+        latitude,
+        longitude,
+        profile_privacy,
+        contact_privacy,
+        date_of_birth,
+        place_of_birth,
+        about,
+        website,
+        facebook,
+        twitter,
+        instagram,
+        linkedin,
+        youtube,
+        whatsapp,
+        tiktok,
+        threads,
+        curriculum_vitae,
+        open_to_work,
+        identity_number,
+        identity_card
+      );
+      if (user <= 0) throw customError(errorList.updateUserFailed);
+      res.status(200).json({
+        status: "success",
+        message: "Update user success",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  //membuat index user dengan pagination, limit, dan offset, search, sort, dan filter
+  static async index(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { page, size, search, sort, order, province, city } = req.query;
+
+      const limit = size ? Number(size) : 10;
+      const offset = page ? (Number(page) - 1) * limit : 0;
+
+      const users = await UserService.index(
+        limit,
+        offset,
+        search as string,
+        sort as string,
+        order as string,
+        province as string,
+        city as string
+      );
+
+      console.log(users, "ini users");
+
+      res.status(200).json({
+        status: "success",
+        message: "Get users success",
+        pageNow: page || 1,
+        totalItem: users.count,
+        totalPage: Math.ceil(users.count / limit),
+        data: users.rows,
+      });
     } catch (error) {
       next(error);
     }

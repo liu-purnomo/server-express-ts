@@ -106,9 +106,7 @@ module.exports = {
         allowNull: false,
       },
       profile_privacy: {
-        type: Sequelize.ENUM("PUBLIC", "PRIVATE"),
-        defaultValue: "PUBLIC",
-        allowNull: false,
+        type: Sequelize.ARRAY(Sequelize.STRING),
       },
       contact_privacy: {
         type: Sequelize.ENUM("PUBLIC", "PRIVATE"),

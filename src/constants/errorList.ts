@@ -95,4 +95,8 @@ export const errorList = {
     code: 400,
     message: "You cannot reuse a previously used password",
   },
+  updateUserFailed: {
+    code: 400,
+    message: "Update user failed",
+  },
 };

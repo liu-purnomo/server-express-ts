@@ -145,8 +145,9 @@ module.exports = (sequelize, DataTypes) => {
         values: ["PENDING", "ACTIVE", "INACTIVE", "BANNED"],
       },
       profile_privacy: {
-        type: DataTypes.ENUM,
-        values: ["PUBLIC", "PRIVATE"],
+        type: DataTypes.ARRAY(DataTypes.STRING),
+        allowNull: false,
+        defaultValue: [],
       },
       contact_privacy: {
         type: DataTypes.ENUM,
