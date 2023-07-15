@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import { excludeList } from "../constants/excludeList";
 import {
   comparePassword,
@@ -5,7 +6,7 @@ import {
   uuidStringGenerator,
 } from "../helpers";
 
-const { User, Op } = require("../models");
+const { User } = require("../models");
 
 type User = typeof User;
 
@@ -331,22 +332,16 @@ class UserService {
       ];
     }
 
+    whereCondition[Op.and] = [{ status: "ACTIVE" }];
+
     if (province) {
-      if (whereCondition[Op.and]) {
-        whereCondition[Op.and].push({
-          province: { [Op.like]: `%${province}%` },
-        });
-      } else {
-        whereCondition[Op.and] = [{ province: province }];
-      }
+      whereCondition[Op.and].push({
+        province: { [Op.like]: `%${province}%` },
+      });
     }
 
     if (regency) {
-      if (whereCondition[Op.and]) {
-        whereCondition[Op.and].push({ regency: { [Op.like]: `%${regency}%` } });
-      } else {
-        whereCondition[Op.and] = [{ regency: regency }];
-      }
+      whereCondition[Op.and].push({ regency: { [Op.like]: `%${regency}%` } });
     }
 
     let orderCondition: any = [["created_at", "DESC"]];
@@ -355,22 +350,18 @@ class UserService {
       orderCondition = [[sort, order]];
     }
 
-    console.log(whereCondition, orderCondition);
-
     const users = await User.findAndCountAll({
       where: whereCondition,
       limit,
       offset,
-      // order: orderCondition,
+      order: orderCondition,
       attributes: [
         "username",
-        "email",
         "first_name",
         "last_name",
         "avatar",
         "province",
         "regency",
-        "district",
         "about",
         "website",
         "facebook",
@@ -378,7 +369,6 @@ class UserService {
         "instagram",
         "linkedin",
         "youtube",
-        "whatsapp",
         "tiktok",
         "threads",
         "open_to_work",
