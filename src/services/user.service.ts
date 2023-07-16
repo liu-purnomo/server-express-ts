@@ -356,6 +356,7 @@ class UserService {
       offset,
       order: orderCondition,
       attributes: [
+        "id",
         "username",
         "first_name",
         "last_name",
