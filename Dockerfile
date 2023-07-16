@@ -1,6 +1,6 @@
 FROM node:lts-alpine3.17
 
-WORKDIR /
+WORKDIR /dist
 
 COPY ["package.json", "package-lock.json*", "./"]
 

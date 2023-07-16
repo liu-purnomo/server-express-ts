@@ -85,8 +85,6 @@ class UserController {
         email as string
       );
 
-      console.log(updatedRows, updatedData);
-
       if (updatedRows <= 0) throw customError(errorList.generateTokenFailed);
 
       const sendEmail = await sendEmailConfirmation(
@@ -172,7 +170,6 @@ class UserController {
         .status(200)
         .json({ status: "success", message: "Change password success" });
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
@@ -190,8 +187,6 @@ class UserController {
         email as string
       );
 
-      console.log(updatedRows, token, "ini updated data");
-
       if (updatedRows <= 0) throw customError(errorList.generateTokenFailed);
 
       const sendEmail = await sendEmailForgotPassword(
@@ -205,7 +200,6 @@ class UserController {
         .status(200)
         .json({ status: "success", message: "Link for reset pasword sent" });
     } catch (error) {
-      console.error(error);
       next(error);
     }
   }
@@ -390,8 +384,6 @@ class UserController {
         province as string,
         city as string
       );
-
-      console.log(users, "ini users");
 
       res.status(200).json({
         status: "success",

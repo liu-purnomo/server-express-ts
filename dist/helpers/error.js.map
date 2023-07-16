@@ -1,1 +1,0 @@
-{"version":3,"file":"error.js","sourceRoot":"","sources":["../../src/helpers/error.ts"],"names":[],"mappings":";;;AAEO,MAAM,WAAW,GAAG,CAAC,OAAoB,EAAE,EAAE;IAClD,MAAM,KAAK,GAAG;QACZ,IAAI,EAAE,aAAa;QACnB,IAAI,EAAE,OAAO,CAAC,IAAI;QAClB,OAAO,EAAE,OAAO,CAAC,OAAO;KACzB,CAAC;IACF,OAAO,KAAK,CAAC;AACf,CAAC,CAAC;AAPW,QAAA,WAAW,eAOtB"}

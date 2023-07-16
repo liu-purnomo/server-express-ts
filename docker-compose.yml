@@ -7,10 +7,9 @@ services:
     ports:
       - "80:3000"
     environment:
-      TOKEN_KEY: ${TOKEN_KEY}
-      MAIL_USER: ${MAIL_USER}
-      MAIL_PASS: ${MAIL_PASS}
-      BASE_URL: ${BASE_URL}
-      NODE_ENV: ${NODE_ENV}
+      NODE_ENV: production
+      JWT_KEY: ${JWT_KEY}
+      EMAIL_ADDRESS: ${EMAIL_ADDRESS}
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+      BEARER_KEY: ${BEARER_KEY}
       DATABASE_URL: ${DATABASE_URL}
-      MIDTRANS_AUTH: ${MIDTRANS_AUTH}
