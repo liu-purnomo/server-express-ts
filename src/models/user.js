@@ -185,7 +185,7 @@ module.exports = (sequelize, DataTypes) => {
     user.is_confirmed = false;
     user.is_admin = false;
     user.is_verified = false;
-    user.profile_privacy = "PUBLIC";
+    user.profile_privacy = [];
     user.contact_privacy = "PUBLIC";
     user.password = hashPassword(user.password);
 

@@ -108,7 +108,7 @@ class UserController {
 
       const user = await UserService.findByEmail(email as string);
 
-      if (!user) throw customError(errorList.userNotFound);
+      if (!user) throw customError(errorList.invaidEmailOrPassword);
 
       const isPasswordMatch = comparePassword(password, user.password);
 
